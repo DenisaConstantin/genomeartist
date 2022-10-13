@@ -3,7 +3,7 @@
 brew install gnu-sed
 brew install gawk
 
-echo "TE Reference length"
+echo "TE reference length"
 read Qlength
 
 echo "Length of a putative insertion/autoinsertion (in the TE sequence of interest) that may increase the TE sequence length compared to the TE reference length:"
@@ -22,23 +22,28 @@ do
 #Orientare II, 5'.
 if [[ $gstart -gt $gend ]] && [[ $query == *"5" ]]
 then
-echo $query $GD $gstart $gend $qstart $qend >> IR5.orientare2.txt
+echo $query $GD $gstart $gend $qstart $qend > $GD.$gstart.$gend.IR5.orientare2.txt
 #Orientare II, 3'.
 elif [[ $gstart -gt $gend ]] && [[ $query == *"3" ]]
 then
-echo $query $GD $gstart $gend $qstart $qend >> IR3.orientare2.txt
+echo $query $GD $gstart $gend $qstart $qend > $GD.$gstart.$gend.IR3.orientare2.txt
 
 #Orientare I, 5'.
 elif [[ $gstart -lt $gend ]] && [[ $query == *"5" ]]
 then
-echo $query $GD $gstart $gend $qstart $qend >> IR5.orientare1.txt
+echo $query $GD $gstart $gend $qstart $qend > $GD.$gstart.$gend.IR5.orientare1.txt
 #Orientare I, 3'.
 elif [[ $gstart -lt $gend ]] && [[ $query == *"3" ]]
 then
-echo $query $GD $gstart $gend $qstart $qend >> IR3.orientare1.txt
+echo $query $GD $gstart $gend $qstart $qend > $GD.$gstart.$gend.IR3.orientare1.txt
 fi
 done
 
+cat *.IR5.orientare2.txt > IR5.orientare2.txt
+cat *.IR3.orientare2.txt > IR3.orientare2.txt
+cat *.IR5.orientare1.txt > IR5.orientare1.txt
+cat *.IR3.orientare1.txt > IR3.orientare1.txt
+rm -r *.IR5.orientare2.txt *.IR3.orientare2.txt *.IR5.orientare1.txt *.IR3.orientare1.txt
 cat *.orientare1.txt > orientare1.txt
 cat *.orientare2.txt > orientare2.txt
 
@@ -116,7 +121,7 @@ echo "UPSTREAM EXTRACTION"
 export Qlength
 ./UPSTREAM_EXTRACTION.sh 2> /dev/null
 rm -r *.fasta *.txt *.sh
-cat **/*.flanking > JunctionSeq_IR5_Upstream.fasta
+shopt -s globstar | cat **/*.flanking > JunctionSeq_IR5_Upstream.fasta | shopt -u globstar
 gsed -i -e "s/-ins/\-ins_IR5./g" JunctionSeq_IR5_Upstream.fasta
 gsed -i -e "s/contig_/ctg_/g" JunctionSeq_IR5_Upstream.fasta
 
@@ -126,7 +131,7 @@ echo "DOWNSTREAM EXTRACTION"
 export Qlength
 ./DOWNSTREAM_EXTRACTION.sh 2> /dev/null
 rm -r *.fasta *.txt *.sh
-cat **/*.flanking > JunctionSeq_IR3_Downstream.fasta
+shopt -s globstar | cat **/*.flanking > JunctionSeq_IR3_Downstream.fasta | shopt -u globstar
 gsed -i -e "s/-ins/\-ins_IR3./g" JunctionSeq_IR3_Downstream.fasta
 gsed -i -e "s/contig_/ctg_/g" JunctionSeq_IR3_Downstream.fasta
 cd ..
@@ -134,7 +139,7 @@ cd ..
 mkdir ./IR5+3/
 mv IR5_UPSTREAM IR3_DOWNSTREAM IR5+3/
 cd IR5+3/
-cat **/JunctionSeq* > JunctionSeq_IR5+3.fasta
+shopt -s globstar | cat **/JunctionSeq* > JunctionSeq_IR5+3.fasta | shopt -u globstar
 cd ..
 #########################################################################AI VERIFICAT PANA AICI. FUNCTIONEAZA.
 
@@ -170,7 +175,7 @@ echo "Single IR5' UPSTREAM EXTRACTION"
 export Qlength
 ./UPSTREAM_EXTRACTION.sh 2> /dev/null
 rm -r *.fasta *.txt *.sh
-cat **/*.flanking > JunctionSeq_onlyIR5_Upstream.fasta
+shopt -s globstar | cat **/*.flanking > JunctionSeq_onlyIR5_Upstream.fasta | shopt -u globstar
 gsed -i -e "s/-ins/\-ins_only_IR5./g" JunctionSeq_onlyIR5_Upstream.fasta
 gsed -i -e "s/contig_/ctg_/g" JunctionSeq_onlyIR5_Upstream.fasta
 cd ..
@@ -180,14 +185,14 @@ echo "Single IR5' DOWNSTREAM (RefTE + Genomic) EXTRACTION"
 export Qlength
 ./DOWNSTREAM_TE+GENOMIC_EXTRACTION.sh 2> /dev/null
 rm -r *.fasta *.txt *.sh
-cat **/*.flanking > JunctionSeq_onlyIR5_TG_Downstream.fasta
+shopt -s globstar | cat **/*.flanking > JunctionSeq_onlyIR5_TG_Downstream.fasta | shopt -u globstar
 gsed -i -e "s/contig_/ctg_/g" JunctionSeq_onlyIR5_TG_Downstream.fasta
 cd ..
 
 mkdir ./IR5_only/
 mv IR5_only_UPSTREAM IR5_only_DOWNSTREAM_TE+GENOMIC IR5_only/
 cd IR5_only/
-cat **/JunctionSeq* > JunctionSeq_only_IR5.fasta
+shopt -s globstar | cat **/JunctionSeq* > JunctionSeq_only_IR5.fasta | shopt -u globstar
 cd ..
 
 cd IR3_only_DOWNSTREAM/
@@ -195,7 +200,7 @@ echo "Single IR3' DOWNSTREAM EXTRACTION"
 export Qlength
 ./DOWNSTREAM_EXTRACTION.sh 2> /dev/null
 rm -r *.fasta *.txt *.sh
-cat **/*.flanking > JunctionSeq_onlyIR3_Downstream.fasta
+shopt -s globstar | cat **/*.flanking > JunctionSeq_onlyIR3_Downstream.fasta | shopt -u globstar
 gsed -i -e "s/-ins/\-ins_only_IR3./g" JunctionSeq_onlyIR3_Downstream.fasta
 gsed -i -e "s/contig_/ctg_/g" JunctionSeq_onlyIR3_Downstream.fasta
 cd ..
@@ -205,15 +210,15 @@ echo "Single IR3' UPSTREAM (RefTE + Genomic) EXTRACTION"
 export Qlength
 ./UPSTREAM_TE+GENOMIC_EXTRACTION.sh 2> /dev/null
 rm -r *.fasta *.txt *.sh
-cat **/*.flanking > JunctionSeq_onlyIR3_TG_Upstream.fasta
+shopt -s globstar | cat **/*.flanking > JunctionSeq_onlyIR3_TG_Upstream.fasta | shopt -u globstar
 gsed -i -e "s/contig_/ctg_/g" JunctionSeq_onlyIR3_TG_Upstream.fasta
 cd ..
 
 mkdir ./IR3_only/
 mv IR3_only_DOWNSTREAM IR3_only_UPSTREAM_TE+GENOMIC IR3_only/
 cd IR3_only/
-cat **/JunctionSeq* > JunctionSeq_only_IR3.fasta
+shopt -s globstar | cat **/JunctionSeq* > JunctionSeq_only_IR3.fasta | shopt -u globstar
 cd ..
 
-cat **/JunctionSeq* > JunctionQueries.fasta
+shopt -s globstar | cat **/JunctionSeq* > JunctionQueries.fasta | shopt -u globstar
 rm -r *.txt GA.csv
